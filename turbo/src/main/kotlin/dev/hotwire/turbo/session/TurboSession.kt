@@ -615,7 +615,10 @@ class TurboSession internal constructor(
             if (!request.method.equals("GET", ignoreCase = true) ||
                 request.url.scheme?.startsWith("HTTP", ignoreCase = true) != true
             ) {
-                return null
+                return request.requestHeaders?.let { it ->
+                    it[AUTHORIZATION] = "Bearer " + currentVisit?.callback?.getWebResourceRequest()?.requestHeaders?.get(AUTHORIZATION)
+                    super.shouldInterceptRequest(view, request)
+                }
             }
 
             val url = request.url.toString()
