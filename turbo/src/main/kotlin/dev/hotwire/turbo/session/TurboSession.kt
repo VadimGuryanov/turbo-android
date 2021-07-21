@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Build
+import android.util.Log
 import android.util.SparseArray
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
@@ -615,14 +616,14 @@ class TurboSession internal constructor(
             if (!request.method.equals("GET", ignoreCase = true) ||
                 request.url.scheme?.startsWith("HTTP", ignoreCase = true) != true
             ) {
-                logEvent("shouldInterceptRequest", "headers" to request.requestHeaders.toString())
+                Log.e("shouldInterceptRequest", request.requestHeaders.toString())
                 return request.requestHeaders?.let { it ->
                     it[AUTHORIZATION] = "Bearer " + currentVisit?.callback?.getWebResourceRequest()?.requestHeaders?.get(AUTHORIZATION)
-                    logEvent("shouldInterceptRequestAUTH", "headers with auth" to request.requestHeaders.toString())
+                    Log.e("shouldInterceptRequestAUTH", request.requestHeaders.toString())
                     super.shouldInterceptRequest(view, request)
                 }
             }
-            logEvent("shouldInterceptRequest_ATHER_IF", "headers" to request.requestHeaders.toString())
+            Log.e("shouldInterceptRequest_ATHER_IF", request.requestHeaders.toString())
 
             val url = request.url.toString()
             val result = httpRepository.fetch(requestHandler, request)
@@ -633,7 +634,7 @@ class TurboSession internal constructor(
                 }
             }
 
-            logEvent("shouldInterceptRequest_BEFORE_RETURN", "headers" to request.requestHeaders.toString())
+            Log.e("shouldInterceptRequest_BEFORE_RETURN", request.requestHeaders.toString())
 
             return result.response
         }
