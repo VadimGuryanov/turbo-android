@@ -88,6 +88,8 @@ class TurboSession internal constructor(
     var isReady = false
         internal set
 
+    var token: String = ""
+
     init {
         initializeWebView()
         TurboHttpClient.enableCachingWith(context)
@@ -624,6 +626,13 @@ class TurboSession internal constructor(
                 }
             }
             Log.e("shouldInterceptRequest_ATHER_IF", request.requestHeaders.toString())
+
+            token.takeIf { it.isNotEmpty() }?.let {
+                request.requestHeaders?.let { it ->
+                    it[AUTHORIZATION] = "Bearer $it"
+                    Log.e("shouldInterceptRequestAUTH", request.requestHeaders.toString())
+                }
+            }
 
             val url = request.url.toString()
             val result = httpRepository.fetch(requestHandler, request)
