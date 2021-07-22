@@ -626,12 +626,12 @@ class TurboSession internal constructor(
             }
             Log.e("shouldInterceptRequest_ATHER_IF", request.requestHeaders.toString())
 
-            token.takeIf { it.isNotEmpty() }?.let {
-                request.requestHeaders?.let { it ->
-                    it[AUTHORIZATION] = "Bearer $it"
-                    Log.e("shouldInterceptRequestAUTH", request.requestHeaders.toString())
-                }
-            }
+//            token.takeIf { it.isNotEmpty() }?.let {
+//                request.requestHeaders?.let { it ->
+//                    it[AUTHORIZATION] = "Bearer $it"
+//                    Log.e("shouldInterceptRequestAUTH", request.requestHeaders.toString())
+//                }
+//            }
 
             val url = request.url.toString()
             val result = httpRepository.fetch(requestHandler, request)
@@ -644,7 +644,7 @@ class TurboSession internal constructor(
 
             Log.e("shouldInterceptRequest_BEFORE_RETURN", request.requestHeaders.toString())
 
-            return result.response ?: super.shouldInterceptRequest(view, request)
+            return result.response
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {
