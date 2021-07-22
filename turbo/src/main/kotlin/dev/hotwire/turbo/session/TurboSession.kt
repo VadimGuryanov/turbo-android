@@ -422,7 +422,7 @@ class TurboSession internal constructor(
         // WebView.reload(), which fully reloads the page for all URLs.
         when (visit.reload) {
             true -> webView.reload()
-            else -> webView.loadUrl(visit.location)
+            else -> webView.loadUrl(visit.location, mapOf(AUTHORIZATION to token))
         }
     }
 
@@ -645,7 +645,7 @@ class TurboSession internal constructor(
 
             Log.e("shouldInterceptRequest_BEFORE_RETURN", request.requestHeaders.toString())
 
-            return result.response
+            return result.response ?: super.shouldInterceptRequest(view, request)
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {
