@@ -659,7 +659,7 @@ class TurboSession internal constructor(
                     .build()
                 val response: Response = okHttpClient.newCall(request).execute()
                 WebResourceResponse(
-                    response.header("content-type", response.body?.contentType()?.type),
+                    response.header("text/html", response.body?.contentType()?.type),
                     response.header("content-encoding", "utf-8"),
                     response.body?.byteStream()
                 )
