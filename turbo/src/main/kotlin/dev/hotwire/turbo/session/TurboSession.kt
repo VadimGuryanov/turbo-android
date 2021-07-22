@@ -6,7 +6,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Build
-import android.util.Log
 import android.util.SparseArray
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
@@ -31,8 +30,6 @@ import dev.hotwire.turbo.visit.TurboVisitOptions
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
-import java.lang.Exception
 import java.util.*
 
 
@@ -630,12 +627,6 @@ class TurboSession internal constructor(
                 return null
             }
 
-            token.takeIf { it.isNotEmpty() }?.let { token ->
-                request.requestHeaders?.let {
-                    it[AUTHORIZATION] = "Bearer $token"
-                }
-            }
-
             val url = request.url.toString()
             val result = httpRepository.fetch(requestHandler, request)
 
@@ -645,17 +636,7 @@ class TurboSession internal constructor(
                 }
             }
 
-            val okHttpClient = OkHttpClient()
-            val req = Request.Builder().url(url).addHeader(AUTHORIZATION, "Bearer $token")
-                .build()
-            val response = okHttpClient.newCall(req).execute()
-            val webResourceResponse = WebResourceResponse(
-                response.header("text/html", response.body?.contentType()?.type),
-                response.header("content-encoding", "utf-8"),
-                response.body?.byteStream()
-            )
-
-            return result.response ?: webResourceResponse
+            return result.response
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {
