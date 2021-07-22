@@ -29,7 +29,12 @@ import dev.hotwire.turbo.visit.TurboVisit
 import dev.hotwire.turbo.visit.TurboVisitAction
 import dev.hotwire.turbo.visit.TurboVisitOptions
 import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import java.lang.Exception
 import java.util.*
+
 
 /**
  * This class is primarily responsible for managing an instance of an Android WebView that will
@@ -645,6 +650,22 @@ class TurboSession internal constructor(
             Log.e("shouldInterceptRequest_BEFORE_RETURN", request.requestHeaders.toString())
 
             return result.response
+        }
+
+        override fun shouldInterceptRequest(view: WebView, url: String): WebResourceResponse? {
+            return try {
+                val okHttpClient = OkHttpClient()
+                val request = Request.Builder().url(url).addHeader(AUTHORIZATION, "Bearer $token")
+                    .build()
+                val response: Response = okHttpClient.newCall(request).execute()
+                WebResourceResponse(
+                    response.header("content-type", response.body?.contentType()?.type),
+                    response.header("content-encoding", "utf-8"),
+                    response.body?.byteStream()
+                )
+            } catch (e: Exception) {
+                null
+            }
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {
