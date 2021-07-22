@@ -422,7 +422,11 @@ class TurboSession internal constructor(
         // WebView.reload(), which fully reloads the page for all URLs.
         when (visit.reload) {
             true -> webView.reload()
-            else -> webView.loadUrl(visit.location, mapOf(AUTHORIZATION to "Bearer $token"))
+            else -> if (visit.isAuthTokenAdd) {
+                webView.loadUrl(visit.location, mapOf(AUTHORIZATION to "Bearer $token"))
+            } else {
+                webView.loadUrl(visit.location)
+            }
         }
     }
 

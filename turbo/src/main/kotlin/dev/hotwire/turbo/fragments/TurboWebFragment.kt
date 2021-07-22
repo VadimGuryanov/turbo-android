@@ -110,4 +110,8 @@ abstract class TurboWebFragment : TurboFragment(), TurboWebFragmentCallback {
     override fun createWebResourceRequest(): WebResourceRequest? {
         return null
     }
+
+    fun setAuthTokenAdd(isAuthTokenAdd: Boolean) {
+        webDelegate.isAuthTokenAdd = isAuthTokenAdd
+    }
 }
