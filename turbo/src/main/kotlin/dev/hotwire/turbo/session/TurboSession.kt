@@ -422,7 +422,7 @@ class TurboSession internal constructor(
         // WebView.reload(), which fully reloads the page for all URLs.
         when (visit.reload) {
             true -> webView.reload()
-            else -> webView.loadUrl(visit.location, mapOf(AUTHORIZATION to token))
+            else -> webView.loadUrl(visit.location, mapOf(AUTHORIZATION to "Bearer $token"))
         }
     }
 
@@ -618,12 +618,7 @@ class TurboSession internal constructor(
             if (!request.method.equals("GET", ignoreCase = true) ||
                 request.url.scheme?.startsWith("HTTP", ignoreCase = true) != true
             ) {
-                Log.e("shouldInterceptRequest", request.requestHeaders.toString())
-                return request.requestHeaders?.let { it ->
-                    it[AUTHORIZATION] = "Bearer " + currentVisit?.callback?.getWebResourceRequest()?.requestHeaders?.get(AUTHORIZATION)
-                    Log.e("shouldInterceptRequestAUTH", request.requestHeaders.toString())
-                    super.shouldInterceptRequest(view, request)
-                }
+                return null
             }
             Log.e("shouldInterceptRequest_ATHER_IF", request.requestHeaders.toString())
 
