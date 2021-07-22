@@ -639,17 +639,23 @@ class TurboSession internal constructor(
 //            }
 
             val url = request.url.toString()
-            val result = httpRepository.fetch(requestHandler, request)
+            val req = Request.Builder().url(url).addHeader(AUTHORIZATION, "Bearer $token")
+                .build()
+            val response = OkHttpClient().newCall(req).execute()
 
-            currentVisit?.let { visit ->
-                if (visit.location == url) {
-                    visit.completedOffline = result.offline
-                }
-            }
+//            currentVisit?.let { visit ->
+//                if (visit.location == url) {
+//                    visit.completedOffline = result.offline
+//                }
+//            }
 
             Log.e("shouldInterceptRequest_BEFORE_RETURN", request.requestHeaders.toString())
 
-            return result.response
+            return WebResourceResponse(
+                response.header("text/html", response.body?.contentType()?.type),
+                response.header("content-encoding", "utf-8"),
+                response.body?.byteStream()
+            )
         }
 
         override fun shouldInterceptRequest(view: WebView, url: String): WebResourceResponse? {
