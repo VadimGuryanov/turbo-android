@@ -629,33 +629,27 @@ class TurboSession internal constructor(
             ) {
                 return null
             }
-            Log.e("shouldInterceptRequest_ATHER_IF", request.requestHeaders.toString())
-
-//            token.takeIf { it.isNotEmpty() }?.let {
-//                request.requestHeaders?.let { it ->
-//                    it[AUTHORIZATION] = "Bearer $it"
-//                    Log.e("shouldInterceptRequestAUTH", request.requestHeaders.toString())
-//                }
-//            }
 
             val url = request.url.toString()
+            val result = httpRepository.fetch(requestHandler, request)
+
+            currentVisit?.let { visit ->
+                if (visit.location == url) {
+                    visit.completedOffline = result.offline
+                }
+            }
+
+            val okHttpClient = OkHttpClient()
             val req = Request.Builder().url(url).addHeader(AUTHORIZATION, "Bearer $token")
                 .build()
-            val response = OkHttpClient().newCall(req).execute()
-
-//            currentVisit?.let { visit ->
-//                if (visit.location == url) {
-//                    visit.completedOffline = result.offline
-//                }
-//            }
-
-            Log.e("shouldInterceptRequest_BEFORE_RETURN", request.requestHeaders.toString())
-
-            return WebResourceResponse(
+            val response = okHttpClient.newCall(req).execute()
+            val webResourceResponse = WebResourceResponse(
                 response.header("text/html", response.body?.contentType()?.type),
                 response.header("content-encoding", "utf-8"),
                 response.body?.byteStream()
             )
+
+            return result.response ?: webResourceResponse
         }
 
         override fun shouldInterceptRequest(view: WebView, url: String): WebResourceResponse? {
