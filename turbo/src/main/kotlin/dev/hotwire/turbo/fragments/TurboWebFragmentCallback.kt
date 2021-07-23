@@ -79,6 +79,4 @@ interface TurboWebFragmentCallback {
     fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
         handler.cancel()
     }
-
-    fun createWebResourceRequest(): WebResourceRequest?
 }

@@ -113,12 +113,13 @@ class TurboSession internal constructor(
             "An offline request handler must be provided to pre-cache $location"
         }
 
-        webResourceRequest = currentVisit?.callback?.getWebResourceRequest() ?:
-            TurboPreCacheRequest(url = location, userAgent = webView.settings.userAgentString)
-
-        webResourceRequest?.let {
-            httpRepository.preCache(requestHandler, it)
-        }
+        httpRepository.preCache(
+            requestHandler,
+            TurboPreCacheRequest(
+                url = location,
+                userAgent = webView.settings.userAgentString
+            )
+        )
     }
 
     /**
@@ -425,16 +426,12 @@ class TurboSession internal constructor(
         // sees a WebView.loadUrl() request as a same-page visit instead of
         // requesting a full page reload. To work around this, we call
         // WebView.reload(), which fully reloads the page for all URLs.
-        val headers = webResourceRequest?.requestHeaders.also {
-            it?.put(AUTHORIZATION, "Bearer $token")
-        } ?: mapOf(AUTHORIZATION to "Bearer $token")
+//        val headers = webResourceRequest?.requestHeaders.also {
+//            it?.put(AUTHORIZATION, "Bearer $token")
+//        } ?: mapOf(AUTHORIZATION to "Bearer $token")
         when (visit.reload) {
             true -> webView.reload()
-            else -> if (visit.isAuthTokenAdd) {
-                webView.loadUrl(visit.location, headers)
-            } else {
-                webView.loadUrl(visit.location)
-            }
+            else -> webView.loadUrl(visit.location)
         }
     }
 
@@ -633,7 +630,9 @@ class TurboSession internal constructor(
 
             val url = request.url.toString()
             val okHttpClient = OkHttpClient()
-            val req = Request.Builder().url(url).addHeader(AUTHORIZATION, "Bearer $token")
+            val req = Request.Builder()
+                .url(url)
+                .addHeader(AUTHORIZATION, "Bearer $token")
                 .build()
             val response = okHttpClient.newCall(req).execute()
 

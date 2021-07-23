@@ -10,6 +10,5 @@ internal data class TurboVisit(
     var callback: TurboSessionCallback?,        // Available while current visit
     var identifier: String = "",                // Updated after visitStarted()
     var completedOffline: Boolean = false,      // Updated from shouldInterceptRequest()
-    val options: TurboVisitOptions,
-    var isAuthTokenAdd: Boolean = false
+    val options: TurboVisitOptions
 )

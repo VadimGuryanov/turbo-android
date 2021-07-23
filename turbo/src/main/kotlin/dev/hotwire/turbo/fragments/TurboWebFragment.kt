@@ -106,12 +106,4 @@ abstract class TurboWebFragment : TurboFragment(), TurboWebFragmentCallback {
     override fun onVisitErrorReceived(location: String, errorCode: Int) {
         webDelegate.showErrorView(errorCode)
     }
-
-    override fun createWebResourceRequest(): WebResourceRequest? {
-        return null
-    }
-
-    fun setAuthTokenAdd(isAuthTokenAdd: Boolean) {
-        webDelegate.isAuthTokenAdd = isAuthTokenAdd
-    }
 }

@@ -59,8 +59,6 @@ internal class TurboWebFragmentDelegate(
      */
     val fileChooserResultLauncher = registerFileChooserLauncher()
 
-    var isAuthTokenAdd: Boolean = false
-
     /**
      * Should be called by the implementing Fragment during
      * [androidx.fragment.app.Fragment.onViewCreated].
@@ -229,9 +227,6 @@ internal class TurboWebFragmentDelegate(
         return navDestination
     }
 
-    override fun getWebResourceRequest(): WebResourceRequest? =
-        callback.createWebResourceRequest()
-
     // -----------------------------------------------------------------------
     // Private
     // -----------------------------------------------------------------------
@@ -345,8 +340,7 @@ internal class TurboWebFragmentDelegate(
                     restoreWithCachedSnapshot = restoreWithCachedSnapshot,
                     reload = reload,
                     callback = this@TurboWebFragmentDelegate,
-                    options = options.copy(snapshotHTML = snapshot),
-                    isAuthTokenAdd = isAuthTokenAdd
+                    options = options.copy(snapshotHTML = snapshot)
                 )
             )
         }
