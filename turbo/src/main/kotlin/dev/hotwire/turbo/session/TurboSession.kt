@@ -16,6 +16,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.ViewTarget
 import dev.hotwire.turbo.config.TurboPathConfiguration
 import dev.hotwire.turbo.config.screenshotsEnabled
 import dev.hotwire.turbo.delegates.TurboFileChooserDelegate
@@ -30,6 +31,8 @@ import dev.hotwire.turbo.visit.TurboVisit
 import dev.hotwire.turbo.visit.TurboVisitAction
 import dev.hotwire.turbo.visit.TurboVisitOptions
 import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -616,6 +619,12 @@ class TurboSession internal constructor(
                 visitProposedToLocation(location, options.toJson())
             }
 
+            token.takeIf { it.isNotEmpty() }?.let {
+                webView.post {
+                    webView.loadUrl(request.url.toString(), mapOf(AUTHORIZATION to "Bearer $token"))
+                }
+            }
+
             logEvent("shouldOverrideUrlLoading", "location" to location, "shouldOverride" to shouldOverride)
             return shouldOverride
         }
@@ -631,15 +640,13 @@ class TurboSession internal constructor(
                 return null
             }
 
-            val url = request.url.toString()
             token.takeIf { it.isNotEmpty() }?.let {
-                webView.post {
-                    webView.loadUrl(url, mapOf(AUTHORIZATION to "Bearer $token"))
-                }
+                request.requestHeaders.put(AUTHORIZATION, "Bearer $token")
             }
 
             val requestHandler = offlineRequestHandler
 
+            val url = request.url.toString()
             requestHandler?.let {
                 val result = httpRepository.fetch(requestHandler, request)
 
