@@ -28,8 +28,6 @@ import dev.hotwire.turbo.visit.TurboVisit
 import dev.hotwire.turbo.visit.TurboVisitAction
 import dev.hotwire.turbo.visit.TurboVisitOptions
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.util.*
 
 
@@ -98,6 +96,8 @@ class TurboSession internal constructor(
         fileChooserDelegate.deleteCachedFiles()
     }
 
+    private var webResourceRequest: WebResourceRequest? = null
+
     // Public
 
     /**
@@ -111,11 +111,12 @@ class TurboSession internal constructor(
             "An offline request handler must be provided to pre-cache $location"
         }
 
-        val webResourceRequest = currentVisit?.callback?.getWebResourceRequest() ?:
+        webResourceRequest = currentVisit?.callback?.getWebResourceRequest() ?:
             TurboPreCacheRequest(url = location, userAgent = webView.settings.userAgentString)
 
-        httpRepository.preCache(requestHandler, webResourceRequest)
-
+        webResourceRequest?.let {
+            httpRepository.preCache(requestHandler, it)
+        }
     }
 
     /**
@@ -422,10 +423,13 @@ class TurboSession internal constructor(
         // sees a WebView.loadUrl() request as a same-page visit instead of
         // requesting a full page reload. To work around this, we call
         // WebView.reload(), which fully reloads the page for all URLs.
+        val headers = webResourceRequest?.requestHeaders.also {
+            it?.put(AUTHORIZATION, "Bearer $token")
+        } ?: mapOf(AUTHORIZATION to "Bearer $token")
         when (visit.reload) {
             true -> webView.reload()
             else -> if (visit.isAuthTokenAdd) {
-                webView.loadUrl(visit.location, mapOf(AUTHORIZATION to "Bearer $token"))
+                webView.loadUrl(visit.location, headers)
             } else {
                 webView.loadUrl(visit.location)
             }
