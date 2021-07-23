@@ -633,7 +633,9 @@ class TurboSession internal constructor(
 
             val url = request.url.toString()
             token.takeIf { it.isNotEmpty() }?.let {
-                webView.loadUrl(url, mapOf(AUTHORIZATION to "Bearer $token"))
+                webView.post {
+                    webView.loadUrl(url, mapOf(AUTHORIZATION to "Bearer $token"))
+                }
             }
 
             val requestHandler = offlineRequestHandler
