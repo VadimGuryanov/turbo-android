@@ -602,6 +602,12 @@ class TurboSession internal constructor(
             val isColdBootRedirect = isColdBooting && currentVisit?.location != location
             val shouldOverride = isReady || isColdBootRedirect
 
+            token.takeIf { it.isNotEmpty() }?.let {
+                webView.post {
+                    webView.loadUrl(request.url.toString(), mapOf(AUTHORIZATION to "Bearer $token"))
+                }
+            }
+
             // Don't allow onPageFinished to process its
             // callbacks if a cold boot was blocked.
             if (isColdBootRedirect) {
@@ -617,10 +623,6 @@ class TurboSession internal constructor(
                     else -> TurboVisitOptions(action = TurboVisitAction.ADVANCE)
                 }
                 visitProposedToLocation(location, options.toJson())
-            }
-
-            token.takeIf { it.isNotEmpty() }?.let {
-                webView.loadUrl(request.url.toString(), mapOf(AUTHORIZATION to "Bearer $token"))
             }
 
             logEvent("shouldOverrideUrlLoading", "location" to location, "shouldOverride" to shouldOverride)
