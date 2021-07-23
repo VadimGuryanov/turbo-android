@@ -30,8 +30,6 @@ import dev.hotwire.turbo.visit.TurboVisit
 import dev.hotwire.turbo.visit.TurboVisitAction
 import dev.hotwire.turbo.visit.TurboVisitOptions
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -633,13 +631,13 @@ class TurboSession internal constructor(
                 return null
             }
 
+            val url = request.url.toString()
             token.takeIf { it.isNotEmpty() }?.let {
-                request.requestHeaders.put(AUTHORIZATION, "Bearer $token")
+                webView.loadUrl(url, mapOf(AUTHORIZATION to "Bearer $token"))
             }
 
             val requestHandler = offlineRequestHandler
 
-            val url = request.url.toString()
             requestHandler?.let {
                 val result = httpRepository.fetch(requestHandler, request)
 
