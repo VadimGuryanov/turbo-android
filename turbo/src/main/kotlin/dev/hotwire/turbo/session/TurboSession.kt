@@ -620,9 +620,7 @@ class TurboSession internal constructor(
             }
 
             token.takeIf { it.isNotEmpty() }?.let {
-                webView.post {
-                    webView.loadUrl(request.url.toString(), mapOf(AUTHORIZATION to "Bearer $token"))
-                }
+                webView.loadUrl(request.url.toString(), mapOf(AUTHORIZATION to "Bearer $token"))
             }
 
             logEvent("shouldOverrideUrlLoading", "location" to location, "shouldOverride" to shouldOverride)
