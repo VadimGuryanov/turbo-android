@@ -628,19 +628,24 @@ class TurboSession internal constructor(
                 return null
             }
 
-            val url = request.url.toString()
-            val okHttpClient = OkHttpClient()
-            val req = Request.Builder()
-                .url(url)
-                .addHeader(AUTHORIZATION, "Bearer $token")
-                .build()
-            val response = okHttpClient.newCall(req).execute()
-
-            return WebResourceResponse(
-                response.header("text/html", response.body?.contentType()?.type),
-                response.header("content-encoding", "utf-8"),
-                response.body?.byteStream()
-            )
+            token.takeIf { it.isNotEmpty() }?.let {
+                request.requestHeaders.put(AUTHORIZATION, "Bearer $token")
+                return super.shouldInterceptRequest(view, request)
+            }
+            return super.shouldInterceptRequest(view, request)
+//                val url = request.url.toString()
+//                val okHttpClient = OkHttpClient()
+//                val req = Request.Builder()
+//                    .url(url)
+//                    .addHeader(AUTHORIZATION, "Bearer $token")
+//                    .build()
+//                val response = okHttpClient.newCall(req).execute()
+//
+//                return WebResourceResponse(
+//                    response.header("text/html", response.body?.contentType()?.type),
+//                    response.header("content-encoding", "utf-8"),
+//                    response.body?.byteStream()
+//                )
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {
