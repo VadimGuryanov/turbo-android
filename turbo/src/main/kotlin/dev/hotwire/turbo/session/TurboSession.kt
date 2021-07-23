@@ -14,6 +14,8 @@ import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import dev.hotwire.turbo.config.TurboPathConfiguration
 import dev.hotwire.turbo.config.screenshotsEnabled
 import dev.hotwire.turbo.delegates.TurboFileChooserDelegate
@@ -30,6 +32,9 @@ import dev.hotwire.turbo.visit.TurboVisitOptions
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.util.*
 
 
@@ -648,6 +653,25 @@ class TurboSession internal constructor(
 //                )
         }
 
+        override fun shouldInterceptRequest(view: WebView?, url: String?): WebResourceResponse? {
+            if(url == null) return super.shouldInterceptRequest(view, url as String)
+            return when {
+                url.toLowerCase(Locale.ROOT).contains(".jpg") || url.toLowerCase(Locale.ROOT).contains(".jpeg") -> {
+                    val bitmap = Glide.with(webView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL).load(url).submit().get()
+                    WebResourceResponse("image/jpg", "UTF-8",getBitmapInputStream(bitmap, Bitmap.CompressFormat.JPEG))
+                }
+                url.toLowerCase(Locale.ROOT).contains(".png") -> {
+                    val bitmap = Glide.with(webView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL).load(url).submit().get()
+                    WebResourceResponse("image/png", "UTF-8",getBitmapInputStream(bitmap, Bitmap.CompressFormat.PNG))
+                }
+                url.toLowerCase(Locale.ROOT).contains(".webp") -> {
+                    val bitmap = Glide.with(webView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL).load(url).submit().get()
+                    WebResourceResponse("image/webp", "UTF-8",getBitmapInputStream(bitmap, Bitmap.CompressFormat.WEBP_LOSSY))
+                }
+                else -> super.shouldInterceptRequest(view, url)
+            }
+        }
+
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {
             super.onReceivedError(view, request, error)
 
@@ -710,6 +734,13 @@ class TurboSession internal constructor(
 
         private fun String.identifier(): String {
             return hashCode().toString()
+        }
+
+        private fun getBitmapInputStream(bitmap:Bitmap,compressFormat: Bitmap.CompressFormat): InputStream {
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            bitmap.compress(compressFormat, 80, byteArrayOutputStream)
+            val bitmapData: ByteArray = byteArrayOutputStream.toByteArray()
+            return ByteArrayInputStream(bitmapData)
         }
     }
 }
