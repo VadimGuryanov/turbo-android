@@ -3,7 +3,7 @@
   // with backwards compatibility for Turbolinks 5
   class TurboNative {
     constructor() {
-//      this.registerAdapter()
+      this.registerAdapter()
     }
 
     registerAdapter() {

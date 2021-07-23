@@ -28,6 +28,8 @@ import dev.hotwire.turbo.visit.TurboVisit
 import dev.hotwire.turbo.visit.TurboVisitAction
 import dev.hotwire.turbo.visit.TurboVisitOptions
 import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.util.*
 
 
@@ -156,7 +158,7 @@ class TurboSession internal constructor(
 
         when {
             isColdBooting -> visitPending = true
-//            isReady -> visitLocation(visit)
+            isReady -> visitLocation(visit)
             else -> visitLocationAsColdBoot(visit)
         }
     }
@@ -623,8 +625,6 @@ class TurboSession internal constructor(
         }
 
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-            val requestHandler = offlineRequestHandler ?: return null
-
             if (!request.method.equals("GET", ignoreCase = true) ||
                 request.url.scheme?.startsWith("HTTP", ignoreCase = true) != true
             ) {
@@ -632,15 +632,16 @@ class TurboSession internal constructor(
             }
 
             val url = request.url.toString()
-            val result = httpRepository.fetch(requestHandler, request)
+            val okHttpClient = OkHttpClient()
+            val req = Request.Builder().url(url).addHeader(AUTHORIZATION, "Bearer $token")
+                .build()
+            val response = okHttpClient.newCall(req).execute()
 
-            currentVisit?.let { visit ->
-                if (visit.location == url) {
-                    visit.completedOffline = result.offline
-                }
-            }
-
-            return result.response
+            return WebResourceResponse(
+                response.header("text/html", response.body?.contentType()?.type),
+                response.header("content-encoding", "utf-8"),
+                response.body?.byteStream()
+            )
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {
