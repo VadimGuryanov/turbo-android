@@ -96,8 +96,6 @@ class TurboSession internal constructor(
     var isReady = false
         internal set
 
-    var token: String = ""
-
     init {
         initializeWebView()
         TurboHttpClient.enableCachingWith(context)
@@ -602,12 +600,6 @@ class TurboSession internal constructor(
             val location = request.url.toString()
             val isColdBootRedirect = isColdBooting && currentVisit?.location != location
             val shouldOverride = isReady || isColdBootRedirect
-
-            token.takeIf { it.isNotEmpty() }?.let {
-                webView.post {
-                    webView.loadUrl(request.url.toString(), mapOf(AUTHORIZATION to "Bearer $token"))
-                }
-            }
 
             // Don't allow onPageFinished to process its
             // callbacks if a cold boot was blocked.
