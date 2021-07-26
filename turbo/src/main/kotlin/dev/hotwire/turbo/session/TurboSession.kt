@@ -432,12 +432,13 @@ class TurboSession internal constructor(
         // sees a WebView.loadUrl() request as a same-page visit instead of
         // requesting a full page reload. To work around this, we call
         // WebView.reload(), which fully reloads the page for all URLs.
-//        val headers = webResourceRequest?.requestHeaders.also {
-//            it?.put(AUTHORIZATION, "Bearer $token")
-//        } ?: mapOf(AUTHORIZATION to "Bearer $token")
         when (visit.reload) {
             true -> webView.reload()
-            else -> webView.loadUrl(visit.location)
+            else -> if (visit.headers.isNotEmpty()) {
+                webView.loadUrl(visit.location, visit.headers)
+            } else {
+                webView.loadUrl(visit.location)
+            }
         }
     }
 
@@ -634,46 +635,20 @@ class TurboSession internal constructor(
         }
 
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+            val requestHandler = offlineRequestHandler ?: return null
             if (!request.method.equals("GET", ignoreCase = true) ||
                 request.url.scheme?.startsWith("HTTP", ignoreCase = true) != true
             ) {
                 return null
             }
-
-            token.takeIf { it.isNotEmpty() }?.let {
-                request.requestHeaders.put(AUTHORIZATION, "Bearer $token")
-            }
-
-            val requestHandler = offlineRequestHandler
-
             val url = request.url.toString()
-            requestHandler?.let {
-                val result = httpRepository.fetch(requestHandler, request)
-
-                currentVisit?.let { visit ->
-                    if (visit.location == url) {
-                        visit.completedOffline = result.offline
-                    }
+            val result = httpRepository.fetch(requestHandler, request)
+            currentVisit?.let { visit ->
+                if (visit.location == url) {
+                    visit.completedOffline = result.offline
                 }
-
-                return result.response ?: super.shouldInterceptRequest(view, request)
-            } ?: run {
-                return super.shouldInterceptRequest(view, request)
             }
-
-//                val url = request.url.toString()
-//                val okHttpClient = OkHttpClient()
-//                val req = Request.Builder()
-//                    .url(url)
-//                    .addHeader(AUTHORIZATION, "Bearer $token")
-//                    .build()
-//                val response = okHttpClient.newCall(req).execute()
-//
-//                return WebResourceResponse(
-//                    response.header("text/html", response.body?.contentType()?.type),
-//                    response.header("content-encoding", "utf-8"),
-//                    response.body?.byteStream()
-//                )
+            return result.response
         }
 
         override fun shouldInterceptRequest(view: WebView?, url: String?): WebResourceResponse? {

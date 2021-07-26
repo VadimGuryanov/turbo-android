@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
 import androidx.activity.result.ActivityResultLauncher
 import dev.hotwire.turbo.R
 import dev.hotwire.turbo.delegates.TurboWebFragmentDelegate
@@ -106,4 +105,10 @@ abstract class TurboWebFragment : TurboFragment(), TurboWebFragmentCallback {
     override fun onVisitErrorReceived(location: String, errorCode: Int) {
         webDelegate.showErrorView(errorCode)
     }
+
+    var headers: Map<String, String> = mapOf()
+        set(value) {
+            webDelegate.headers = value
+            field = value
+        }
 }
