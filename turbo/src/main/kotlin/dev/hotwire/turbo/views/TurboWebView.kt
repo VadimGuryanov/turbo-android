@@ -50,7 +50,7 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
         get() = versionName?.substringBefore(".")?.toIntOrNull()
 
     internal fun visitLocation(location: String, options: TurboVisitOptions, restorationIdentifier: String) {
-        val args = encodeArguments(location, options.toJson(), restorationIdentifier)
+        val args = encodeArguments("'$location'", options.toJson(), "'$restorationIdentifier'")
         runJavascript("window.turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
     }
 
@@ -80,6 +80,6 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     private fun encodeArguments(vararg args: Any): String? {
-        return args.joinToString(",") { gson.toJson(it) }
+        return args.joinToString(separator = ",")
     }
 }
