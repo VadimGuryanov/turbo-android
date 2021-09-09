@@ -51,11 +51,11 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
 
     internal fun visitLocation(location: String, options: TurboVisitOptions, restorationIdentifier: String) {
         val args = "'$location','${options.toJson()}','$restorationIdentifier'"
-        runJavascript("javascript:window.turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
+        runJavascript("window.turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
     }
 
     internal fun visitRenderedForColdBoot(coldBootVisitIdentifier: String) {
-        runJavascript("javascript:turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
+        runJavascript("window.turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
     }
 
     internal fun installBridge(onBridgeInstalled: () -> Unit) {
