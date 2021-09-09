@@ -51,7 +51,13 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
 
     internal fun visitLocation(location: String, options: TurboVisitOptions, restorationIdentifier: String) {
         val args = "'$location','${options.toJson()}','$restorationIdentifier'"
-        runJavascript("window.turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
+        runJavascript("""
+            window.turboNative.visitLocationWithOptionsAndRestorationIdentifier(
+                '$location',
+                '${options.toJson()}',
+                '$restorationIdentifier'
+            )
+        """)
     }
 
     internal fun visitRenderedForColdBoot(coldBootVisitIdentifier: String) {
