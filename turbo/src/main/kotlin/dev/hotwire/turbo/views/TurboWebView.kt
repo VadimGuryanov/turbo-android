@@ -57,6 +57,7 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
             logEvent("ReInstallBridge", listOf("method" to "visitLocation"))
             runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
         }, onBridgeComplete = {
+            logEvent("OnBridgeComplete", listOf("method" to "visitLocation"))
             runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
         })
     }
@@ -66,6 +67,7 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
             logEvent("ReInstallBridge", listOf("method" to "visitRenderedForColdBoot"))
             runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
         }, onBridgeComplete = {
+            logEvent("OnBridgeComplete", listOf("method" to "visitRenderedForColdBoot"))
             runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
         })
     }
