@@ -59,9 +59,6 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     internal fun visitRenderedForColdBoot(coldBootVisitIdentifier: String) {
-        installBridge {
-            logEvent("ReInstallBridge", listOf("method" to "visitRenderedForColdBoot"))
-        }
         runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
     }
 
