@@ -59,8 +59,6 @@ internal class TurboWebFragmentDelegate(
      */
     val fileChooserResultLauncher = registerFileChooserLauncher()
 
-    var headers: Map<String, String> = mapOf()
-
     /**
      * Should be called by the implementing Fragment during
      * [androidx.fragment.app.Fragment.onViewCreated].
@@ -353,8 +351,7 @@ internal class TurboWebFragmentDelegate(
                     restoreWithCachedSnapshot = restoreWithCachedSnapshot,
                     reload = reload,
                     callback = this@TurboWebFragmentDelegate,
-                    options = options.copy(snapshotHTML = snapshot),
-                    headers = headers
+                    options = options.copy(snapshotHTML = snapshot)
                 )
             )
         }

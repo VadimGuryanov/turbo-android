@@ -673,7 +673,7 @@ class TurboSession internal constructor(
                 }
                 url.toLowerCase(Locale.ROOT).contains(".webp") -> {
                     val bitmap = Glide.with(webView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL).load(url).submit().get()
-                    WebResourceResponse("image/webp", "UTF-8",getBitmapInputStream(bitmap, Bitmap.CompressFormat.WEBP_LOSSY))
+                    WebResourceResponse("image/webp", "UTF-8",getBitmapInputStream(bitmap, Bitmap.CompressFormat.WEBP))
                 }
                 else -> super.shouldInterceptRequest(view, url)
             }
