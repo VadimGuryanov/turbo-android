@@ -27,7 +27,7 @@ class MainSessionNavHostFragment : TurboSessionNavHostFragment() {
 
     override val startLocation = "https://turbo-native-demo.glitch.me/"
 
-    override val registeredActivities: List<KClass<out Activity>>
+    override val registeredActivities: List<KClass<out AppCompatActivity>>
         get() = listOf(
             // Leave empty unless you have more 
             // than one TurboActivity in your app
@@ -42,7 +42,7 @@ class MainSessionNavHostFragment : TurboSessionNavHostFragment() {
     override val pathConfigurationLocation: TurboPathConfiguration.Location
         get() = TurboPathConfiguration.Location(
             assetFilePath = "json/configuration.json",
-            remoteFileUrl = "https://turbo.hotwire.dev/demo/configurations/android-v1.json"
+            remoteFileUrl = "https://turbo.hotwired.dev/demo/configurations/android-v1.json"
         )
 }
 ```

@@ -24,7 +24,7 @@ class TurboPathConfigurationTest : BaseRepositoryTest() {
     private lateinit var context: Context
     private lateinit var pathConfiguration: TurboPathConfiguration
     private val mockRepository = mock<TurboPathConfigurationRepository>()
-    private val url = "https://turbo.hotwire.dev"
+    private val url = "https://turbo.hotwired.dev"
 
     @Before
     override fun setup() {
@@ -38,7 +38,7 @@ class TurboPathConfigurationTest : BaseRepositoryTest() {
 
     @Test
     fun assetConfigurationIsLoaded() {
-        assertThat(pathConfiguration.rules.size).isEqualTo(7)
+        assertThat(pathConfiguration.rules.size).isEqualTo(8)
     }
 
     @Test

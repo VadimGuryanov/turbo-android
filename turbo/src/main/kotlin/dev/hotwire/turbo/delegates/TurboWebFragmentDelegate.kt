@@ -93,6 +93,7 @@ internal class TurboWebFragmentDelegate(
     fun onStartAfterModalResult(result: TurboSessionModalResult) {
         if (!result.shouldNavigate) {
             initNavigationVisit()
+            initWebChromeClient()
         }
     }
 
@@ -111,6 +112,7 @@ internal class TurboWebFragmentDelegate(
      * before navigation.
      */
     fun onDialogCancel() {
+        session().removeCallback(this)
         detachWebView()
     }
 
@@ -122,6 +124,7 @@ internal class TurboWebFragmentDelegate(
         // The WebView is already detached in most circumstances, but sometimes
         // fast user cancellation does not call onCancel() before onDismiss()
         if (webViewIsAttached()) {
+            session().removeCallback(this)
             detachWebView()
         }
     }
@@ -131,6 +134,8 @@ internal class TurboWebFragmentDelegate(
      * [dev.hotwire.turbo.nav.TurboNavDestination.refresh]
      */
     fun refresh(displayProgress: Boolean) {
+        if (webView.url == null) return
+
         turboView?.webViewRefresh?.apply {
             if (displayProgress && !isRefreshing) {
                 isRefreshing = true
@@ -299,9 +304,15 @@ internal class TurboWebFragmentDelegate(
 
             // Visit every time the WebView is reattached to the current Fragment.
             if (isWebViewAttachedToNewDestination) {
-                showProgressView(location)
-                visit(location, restoreWithCachedSnapshot = !isInitialVisit, reload = false)
-                isInitialVisit = false
+                val currentSessionVisitRestored = !isInitialVisit &&
+                    session().currentVisit?.destinationIdentifier == identifier &&
+                    session().restoreCurrentVisit(this)
+
+                if (!currentSessionVisitRestored) {
+                    showProgressView(location)
+                    visit(location, restoreWithCachedSnapshot = !isInitialVisit, reload = false)
+                    isInitialVisit = false
+                }
             }
         }
     }

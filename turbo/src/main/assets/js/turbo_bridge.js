@@ -92,6 +92,13 @@
     // Adapter interface
 
     visitProposedToLocation(location, options) {
+      if (window.Turbo && typeof Turbo.navigator.locationWithActionIsSamePage === "function") {
+        if (Turbo.navigator.locationWithActionIsSamePage(location, options.action)) {
+          Turbo.navigator.view.scrollToAnchorFromLocation(location)
+          return
+        }
+      }
+
       TurboSession.visitProposedToLocation(location.toString(), JSON.stringify(options))
     }
 
@@ -109,7 +116,7 @@
     }
 
     visitRequestStarted(visit) {
-      // Purposely left unimplemented. visitStarted covers most cases.
+      TurboSession.visitRequestStarted(visit.identifier)
     }
 
     visitRequestCompleted(visit) {

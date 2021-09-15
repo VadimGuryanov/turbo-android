@@ -2,6 +2,8 @@ package dev.hotwire.turbo.session
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
+import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
 import dev.hotwire.turbo.nav.TurboNavDestination
 import dev.hotwire.turbo.util.toJson
@@ -39,7 +41,7 @@ class TurboSessionTest {
         activity = buildActivity(TurboTestActivity::class.java).get()
         session = TurboSession("test", activity, webView)
         visit = TurboVisit(
-            location = "https://turbo.hotwire.dev",
+            location = "https://turbo.hotwired.dev",
             destinationIdentifier = 1,
             restoreWithCachedSnapshot = false,
             reload = false,
@@ -75,7 +77,7 @@ class TurboSessionTest {
         val visitIdentifier = "12345"
 
         session.currentVisit = visit.copy(identifier = visitIdentifier)
-        session.visitStarted(visitIdentifier, true, "https://turbo.hotwire.dev")
+        session.visitStarted(visitIdentifier, true, "https://turbo.hotwired.dev")
 
         assertThat(session.currentVisit?.identifier).isEqualTo(visitIdentifier)
     }
@@ -153,6 +155,43 @@ class TurboSessionTest {
 
         assertThat(session.coldBootVisitIdentifier).isEmpty()
         assertThat(session.currentVisit?.identifier).isEmpty()
+    }
+
+    @Test
+    fun restoreCurrentVisit() {
+        val visitIdentifier = "12345"
+        val restorationIdentifier = "67890"
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.turboIsReady(true)
+        session.pageLoaded(restorationIdentifier)
+
+        assertThat(session.restoreCurrentVisit(callback)).isTrue()
+        verify(callback, times(2)).visitCompleted(false)
+    }
+
+    @Test
+    fun restoreCurrentVisitFailsWithNoRestorationIdentifier() {
+        val visitIdentifier = "12345"
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.turboIsReady(true)
+
+        assertThat(session.restoreCurrentVisit(callback)).isFalse()
+        verify(callback, times(1)).visitCompleted(false)
+    }
+
+    @Test
+    fun restoreCurrentVisitFailsWithSessionNotReady() {
+        val visitIdentifier = "12345"
+        val restorationIdentifier = "67890"
+
+        session.currentVisit = visit.copy(identifier = visitIdentifier)
+        session.pageLoaded(restorationIdentifier)
+        session.turboIsReady(false)
+
+        assertThat(session.restoreCurrentVisit(callback)).isFalse()
+        verify(callback, never()).visitCompleted(false)
     }
 
     @Test

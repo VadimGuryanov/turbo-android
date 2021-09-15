@@ -6,6 +6,7 @@ import android.net.Uri
 import dev.hotwire.turbo.nav.TurboNavPresentation
 import dev.hotwire.turbo.nav.TurboNavPresentationContext
 import com.google.gson.annotations.SerializedName
+import dev.hotwire.turbo.nav.TurboNavQueryStringPresentation
 import java.net.URL
 
 /**
@@ -47,7 +48,7 @@ class TurboPathConfiguration(context: Context) {
          * file must be publicly available via a GET request. The file will be
          * automatically downloaded and cached at app startup. This location
          * must be the full url of the JSON file, for example:
-         * `"https://turbo.hotwire.dev/demo/json/configuration.json"`
+         * `"https://turbo.hotwired.dev/demo/json/configuration.json"`
          */
         val remoteFileUrl: String? = null
     )
@@ -108,6 +109,14 @@ val TurboPathConfigurationProperties.presentation: TurboNavPresentation
         TurboNavPresentation.valueOf(value.toUpperCase())
     } catch (e: IllegalArgumentException) {
         TurboNavPresentation.DEFAULT
+    }
+
+val TurboPathConfigurationProperties.queryStringPresentation: TurboNavQueryStringPresentation
+    @SuppressLint("DefaultLocale") get() = try {
+        val value = get("query_string_presentation") ?: "default"
+        TurboNavQueryStringPresentation.valueOf(value.toUpperCase())
+    } catch (e: IllegalArgumentException) {
+        TurboNavQueryStringPresentation.DEFAULT
     }
 
 val TurboPathConfigurationProperties.context: TurboNavPresentationContext
