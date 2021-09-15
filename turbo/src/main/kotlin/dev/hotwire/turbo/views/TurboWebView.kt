@@ -52,27 +52,22 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
 
     internal fun visitLocation(location: String, options: TurboVisitOptions, restorationIdentifier: String) {
         val args = encodeArguments(location, options.toJson(), restorationIdentifier)
-
-        installBridge(onBridgeInstalled = {
-            logEvent("ReInstallBridge", listOf("method" to "visitLocation"))
-            runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
-        }, onBridgeComplete = {
-            logEvent("OnBridgeComplete", listOf("method" to "visitLocation"))
-            runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
-        })
+        runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)") {
+            installBridge {
+                runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
+            }
+        }
     }
 
     internal fun visitRenderedForColdBoot(coldBootVisitIdentifier: String) {
-        installBridge(onBridgeInstalled = {
-            logEvent("ReInstallBridge", listOf("method" to "visitRenderedForColdBoot"))
-            runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
-        }, onBridgeComplete = {
-            logEvent("OnBridgeComplete", listOf("method" to "visitRenderedForColdBoot"))
-            runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
-        })
+        runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')") {
+            installBridge {
+                runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
+            }
+        }
     }
 
-    internal fun installBridge(onBridgeComplete: () -> Unit = {}, onBridgeInstalled: () -> Unit) {
+    internal fun installBridge(onBridgeInstalled: () -> Unit) {
         val script = "window.turboNative == null"
         val bridge = context.contentFromAsset("js/turbo_bridge.js")
 
@@ -81,8 +76,6 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
                 runJavascript(bridge) {
                     onBridgeInstalled()
                 }
-            } else {
-                onBridgeComplete()
             }
         }
     }
