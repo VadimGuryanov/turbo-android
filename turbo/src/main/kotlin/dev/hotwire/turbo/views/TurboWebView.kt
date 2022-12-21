@@ -12,6 +12,7 @@ import dev.hotwire.turbo.util.runOnUiThread
 import dev.hotwire.turbo.util.toJson
 import dev.hotwire.turbo.visit.TurboVisitOptions
 import com.google.gson.GsonBuilder
+import dev.hotwire.turbo.util.logEvent
 
 /**
  * A Turbo-specific WebView that configures required settings and exposes some helpful info.
@@ -51,11 +52,19 @@ open class TurboWebView @JvmOverloads constructor(context: Context, attrs: Attri
 
     internal fun visitLocation(location: String, options: TurboVisitOptions, restorationIdentifier: String) {
         val args = encodeArguments(location, options.toJson(), restorationIdentifier)
-        runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
+        runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)") {
+            installBridge {
+                runJavascript("turboNative.visitLocationWithOptionsAndRestorationIdentifier($args)")
+            }
+        }
     }
 
     internal fun visitRenderedForColdBoot(coldBootVisitIdentifier: String) {
-        runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
+        runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')") {
+            installBridge {
+                runJavascript("turboNative.visitRenderedForColdBoot('$coldBootVisitIdentifier')")
+            }
+        }
     }
 
     internal fun installBridge(onBridgeInstalled: () -> Unit) {

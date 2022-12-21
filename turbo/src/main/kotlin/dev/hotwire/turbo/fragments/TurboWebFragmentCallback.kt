@@ -2,6 +2,7 @@ package dev.hotwire.turbo.fragments
 
 import android.view.View
 import android.webkit.HttpAuthHandler
+import android.webkit.WebResourceRequest
 import dev.hotwire.turbo.views.TurboView
 import dev.hotwire.turbo.views.TurboWebChromeClient
 import dev.hotwire.turbo.views.TurboWebView

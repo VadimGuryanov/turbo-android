@@ -3,6 +3,7 @@ package dev.hotwire.turbo.delegates
 import android.content.Intent
 import android.graphics.Bitmap
 import android.webkit.HttpAuthHandler
+import android.webkit.WebResourceRequest
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.lifecycle.lifecycleScope

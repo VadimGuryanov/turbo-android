@@ -1,6 +1,7 @@
 package dev.hotwire.turbo.session
 
 import android.webkit.HttpAuthHandler
+import android.webkit.WebResourceRequest
 import dev.hotwire.turbo.nav.TurboNavDestination
 import dev.hotwire.turbo.visit.TurboVisitOptions
 

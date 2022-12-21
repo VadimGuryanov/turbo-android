@@ -26,6 +26,7 @@ internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
     // Limit pre-cache requests to 2 concurrently
     private val preCacheRequestQueue = Semaphore(2)
 
+
     data class Result(
         val response: WebResourceResponse?,
         val offline: Boolean,
@@ -65,6 +66,7 @@ internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
         val headers = requestHandler.getCachedResponseHeaders(url) ?: emptyMap()
         val cacheControl = cacheControl(headers)
 
+        TurboLog.e("Headers: $headers")
         // If the app has an immutable response cached, don't hit the network
         if (cacheControl.immutable) {
             requestHandler.getCachedResponse(url)?.let {
@@ -113,6 +115,7 @@ internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
     private fun buildRequest(resourceRequest: WebResourceRequest): Request {
         val location = resourceRequest.url.toString()
         val headers = resourceRequest.requestHeaders
+        TurboLog.e("Headers in buildRequest: $headers")
         val builder = Request.Builder().url(location)
 
         headers.forEach { builder.header(it.key, it.value) }
@@ -149,6 +152,7 @@ internal class TurboHttpRepository(private val coroutineScope: CoroutineScope) {
     }
 
     private fun resourceResponse(response: Response?): WebResourceResponse? {
+        TurboLog.e("resourceResponse: $response")
         if (response == null) {
             return null
         }
